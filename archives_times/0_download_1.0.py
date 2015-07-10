@@ -4,10 +4,10 @@
 # Desc : Liste de noms
 #
 # Auteur : T.P.
-# Date : 15/2/15
+# Date : 07/07/15
 
-#Premier script essai
-#Tous les noms de fichier pour les années 2002 à 2015
+# ** script de téléchargement **
+# ** Pour les données R32 (32 jours). Modisa et Swfs possibles. **
 
 # ============= Imports ====================
 
@@ -16,10 +16,14 @@ import urllib
 # =========================================
 # ============== def variables ============
 
-Reso= '4km'                     # 9km ## 4km
-Var= 'chl_8d'                   # chlor ## SST ## NSST ## SST4...
-filler= 'R32_CHL_chlor_a_'      # SST4_4 ## CHL_chlor_a_ ## NSST_sst_ ## SST_4 ## ...
 
+Reso= ['9km', '4km', '9', '4'][1]      # ! Verifier le nom des fichiers ('9' ou '9km') !
+
+varnum = 0
+Var= ['chl_8d','sst11mic_8d','poc_8d','nsst_8d',
+      'chl_32d','sst11mic_32d','poc_32d','nsst_32d'][varnum]                # --> local directory
+filler= ['8D_CHL_chlor_a_','8D_SST_sst_','8D_POC_poc_','8D_NSST_',
+         'R32_CHL_chlor_a_','R32_SST_','R32_POC_poc_','R32_NSST_'][varnum]  # --> Web filename
 day= 1
 day2= 32
 b= 8

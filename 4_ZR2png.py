@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
+# ** Conversion ZR en .png **
+# ** Valable pour 4km et 9km **
+
 import os
 import sys
 import numpy as np
@@ -14,12 +17,19 @@ import scipy.signal
 
 #---------- read data ----------#
 vmin,vmax=0,10000
+
+#xzrmin,xzrmax,yzrmin,yzrmax=2500,3500,1500,2200                     # Coordonnées de ZR 4km
+xzrmin,xzrmax,yzrmin,yzrmax=1250,1750,750,1100                      # Coordonnées de ZR 9km
+
 # Suivant : pour pouvoir convertir.
-varnum=0  # on a dl plusieurs variables (ligne 23)
-varg=['sst11mic_8d','poc_8d', 'nsst_8d','chl_8d'][varnum]
+varnum=3 
+
+#varg=['sst11mic_8d','poc_8d', 'nsst_8d','chl_8d'][varnum]         # --> 8D
+varg=['sst11mic_32d','poc_32d', 'nsst_32d','chl_32d'][varnum]       # --> 32D
+
 title=[u'Temperature de surface en °C',u'Carbone organique particlaire (POC) en mg.m-3',u'Temperature de surfarce nocturne en °C',u'Chlorophylle en mg.m-3'][varnum]
 slI=[(0.00071718,-2),(1,0),(0.00071718,-2),(1,0)][varnum] # cette fois varnum récupère pente et intercept. 
-slope=slI[0] # égal au premier de la paire
+slope=slI[0] # égal au premier de la paire slI[varnum]
 intercept=slI[1] 
 
 
@@ -31,13 +41,13 @@ norm=mpl.colors.LogNorm(vmin=0.01, vmax=20)
 colors = [(0.33,0.33,0.33)] + [(plt.cm.jet(i)) for i in xrange(1,256)]
 new_map = mpl.colors.LinearSegmentedColormap.from_list('new_map', colors, N=256) # Colormap
 
-path = '/home/pressions/SATELITIME/data/ZR/aqua/'+varg+'/'
-pathPNG = '/home/pressions/SATELITIME/data/ZR/aqua/'+varg+'/PNG/'
-files = os.listdir(path) #Liste ldes fichiers.
-files.sort() #Trie les fichiers.
-print len(files) #len = longueur de la liste de fichiers.
+path = '/home/pressions/SATELITIME/data/ZR/swf/'+varg+'/9km/'
+pathPNG = '/home/pressions/SATELITIME/data/ZR/swf/'+varg+'/png_9km/'
+files = os.listdir(path)    #Liste ldes fichiers.
+files.sort()                #Trie les fichiers.
+print len(files)            #len = longueur de la liste de fichiers.
 
-#-------------------------------------------------------
+# -------------------------------------------------------
 
 for myfile in files:
 
@@ -87,9 +97,13 @@ for myfile in files:
     #img= plt.imshow(np.flipud(l3d), norm=norm, cmap=new_map , interpolation='bilinear') # plt.get_cmap('gray') #vmin=ScaledDataMinimum, vmax=ScaledDataMaximum,
     #plt.imshow(l3d,norm=norm,origin='upper', cmap=new_map,interpolation='none',aspect='equal') #
     plt.imshow(l3d)
+#    plt.imshow(l3d,extent=[xzrmin,xzrmax,yzrmin,yzrmax],origin='lower', cmap=new_map) #
+    plt.gca().invert_yaxis()    
+    
     #cb.set_label(title)
     plt.title(saison+'   '+annee+'   jour : '+str(j))
     print pathPNG+myfile
-    #plt.savefig(pathPNG+myfile+'.png',dpi=200,bbox_inches='tight')  
+#    plt.savefig(pathPNG+myfile[0:41]+'.png',dpi=200,bbox_inches='tight')  
     plt.show()
     sys.exit()
+print 'fin'

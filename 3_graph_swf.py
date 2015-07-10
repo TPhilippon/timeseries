@@ -4,6 +4,10 @@ Created on Mon Jun  8 09:49:45 2015
 
 @author: upression1
 """
+# ** Pour SWIFS : Traitement mathématique et save en .npy **
+# ** NbTot de data, Moyenne, Ecart-type, mini/max, nb de NAN **
+# ** utilisation des fichiers ZI créés préalablement **
+# ===============================================================================
 
 import os
 import numpy as np
