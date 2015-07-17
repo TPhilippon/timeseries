@@ -25,69 +25,45 @@ import scipy.signal
 # =======================================================================
 # ========================= Variables ===================================
 
+vmin,vmax=0.01,20
+#xzrmin,xzrmax,yzrmin,yzrmax=2500,3500,1500,2200                     # Coordonnées de ZR 4km
+#xzrmin,xzrmax,yzrmin,yzrmax=1250,1750,750,1100                      # Coordonnées de ZR 9km
 
-varnum = 3                                                                    # varnum pour 1 seule variable
+# Suivant : pour pouvoir convertir.
+varnum=3 
 interpolation= 'interpolated/'                                                # 'simple/' ou 'interpolated/' <- sans ou avec interpolation
+reso= '9km'
+sensor='aqua'                                                                 # choose between'aqua' and 'swf'
 #varg=['sst11mic_8d','poc_8d', 'nsst_8d','chl_8d','pic_8d'][varnum]           # --> 8D
 varg=['sst11mic_32d','poc_32d', 'nsst_32d','chl_32d','pic_32d'][varnum]       # --> 32D
-sensor = 'aqua'  # 'swf'                                                      # swf ou aqua
-reso = '9km'  # '4km' ou '9km'                                                # résolution '4km', '4', '9km' ou '9'.
-scaling=[[-2,45,'linear'],[10,1000,'log'],[-2,45,'linear'],[0.01,20,'log']]
-FillValue=[65535.0,-32767.0,-32767.0,-32767.0]                              # Fill values pour chaque variable
-slI=[(0.00071718,-2),(1,0),(0.00071718,-2),(1,0)]                           # Pentes et intercept pour 'nsst_8d', 'poc_8d', 'sst11mic_8d', 'chl_8d'
-
-imfile = '/home/pressions/SATELITIME/data/Chl2009_9km.hdf'                  # Image pour voir les pixels (choisir la bonne résolution)
-
-variable = varg[varnum]
-slope=slI[varnum][0]                                                        # égal au premier de la paire
-intercept=slI[varnum][1] 
-vmin=scaling[varnum][0]
-vmax=scaling[varnum][1]
-scalingtype=scaling[varnum][2]
-
-if reso=='9km':
-    xzrmin,xzrmax,yzrmin,yzrmax=1250,1750,750,1100   # Caraibes 
-if reso=='4km':
-    xzrmin,xzrmax,yzrmin,yzrmax=2500,3500,1500,2200
 
 title=[u'Temperature de surface en °C',u'Carbone organique particlaire (POC) en mg.m-3',u'Temperature de surfarce nocturne en °C',u'Chlorophylle en mg.m-3'][varnum]
 slI=[(0.00071718,-2),(1,0),(0.00071718,-2),(1,0)][varnum] # cette fois varnum récupère pente et intercept. 
 slope=slI[0] # égal au premier de la paire slI[varnum]
 intercept=slI[1] 
 
+#colors = [(0.33,0.33,0.33)] + [(plt.cm.jet(i)) for i in xrange(1,256)]
+#norm=mpl.colors.LogNorm(vmin=vmin, vmax=vmax)
+#new_map = matplotlib.colors.LinearSegmentedColormap.from_list('new_map', colors, N=256) # Colormap
+
+#norm=[mpl.colors.Normalize(vmin=ScaledDataMinimum, vmax=ScaledDataMaximum),mpl.colors.LogNorm(vmin=ScaledDataMinimum,vmax=ScaledDataMaximum), \
+#      mpl.colors.Normalize(vmin=ScaledDataMinimum, vmax=ScaledDataMaximum),mpl.colors.LogNorm(vmin=ScaledDataMinimum, vmax=ScaledDataMaximum)][varnum]
+
+
+norm=mpl.colors.LogNorm(vmin=vmin, vmax=vmax)
+colors = [(0.33,0.33,0.33)] + [(plt.cm.jet(i)) for i in xrange(1,256)]
+new_map = mpl.colors.LinearSegmentedColormap.from_list('new_map', colors, N=256) # Colormap
+
 path = '/home/pressions/SATELITIME/data/ZR/'+sensor+'/'+varg+'/'+reso+'/'
 pathPNG = '/home/pressions/SATELITIME/data/PNG/'+sensor+'/'+varg+'/'+reso+'/png_caraibe/'+interpolation
 
-# -------------------------- Colors map ---------------------------------
-if scalingtype=='log':norm=mpl.colors.LogNorm(vmin=vmin, vmax=vmax)
-if scalingtype=='linear':norm=mpl.colors.Normalize(vmin=vmin, vmax=vmax)
-
-# Colormap Couleur et grise
-colors = [(0.33,0.33,0.33)] + [(plt.cm.jet(i)) for i in xrange(1,256)]                  # Colormap pour les data
-new_map = mpl.colors.LinearSegmentedColormap.from_list('new_map', colors, N=256) 
-#colors2 = [(0.33,0.33,0.33)] + [(plt.cm.gray(i)) for i in xrange(1,256)]               # Colormap pour background
-#new_map_gray = mpl.colors.LinearSegmentedColormap.from_list('new_map_gray', colors2, N=256) 
-
-
-fond = SD(imfile, SDC.READ)      #  Lire depuis le hdf.
-data2 = fond.select('l3m_data')   #  choisit le hdf datasets
-data2 = data2.get()               #  Fonction get() pour avoir vraiment le tableau pour lire le hdf.
-
-data2=data2[yzrmin:yzrmax,xzrmin:xzrmax]
-
-bakmap = data2
-bakmap[ bakmap != -32767.] = 0
-bakmap[ bakmap == -32767.] = np.nan         
-# -------------------------------------------------------------------------
-
-# ==========================================================================
+# ========================================================================
 # ---------- read data ---------- #
 files = os.listdir(path)    #Liste ldes fichiers.
 files.sort()                #Trie les fichiers.
 print len(files)            #len = longueur de la liste de fichiers.
 
-# --------------------------------------------------------------------------
-
+# -------------------------------------------------------
                                         
 for myfile in files:
 
@@ -111,9 +87,7 @@ for myfile in files:
     #------------ Interpolation
     data = l3d
     if interpolation == 'interpolated/':
-
         print 'interpolating....'
-        #data[data>45]=np.nan
         # a boolean array of (width, height) which False where there are missing values and True where there are valid (non-missing) values
         mask = np.isnan(data)
         mymask=mask    
@@ -133,27 +107,24 @@ for myfile in files:
         l3d=l3d*slope+intercept
     
     #---------- Plot Data Global Map ----------#
-#    fig=plt.figure()
-#    ax = fig.add_subplot(1,1,1)
-#    c = ax.pcolormesh(X, Y, weighted_temperature)
+    fig=plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    c = ax.pcolormesh(X, Y, weighted_temperature)
     #img= plt.imshow(np.flipud(l3d), norm=norm, cmap=new_map , interpolation='bilinear') # plt.get_cmap('gray') #vmin=ScaledDataMinimum, vmax=ScaledDataMaximum,
 #    plt.imshow(data,norm=norm,origin='upper', cmap=new_map,interpolation='none',aspect='equal') #
 
-    l3d = l3d+bakmap
-    palette = plt.cm.jet
-    palette.set_bad('w',0.8)
     plt.imshow(l3d,norm=norm, origin='upper', cmap=new_map)
-#    plt.imshow(bakmap, origin = 'upper', cmap=new_map_gray)
+    
 #    plt.imshow(data,norm=norm,extent=[xzrmin,xzrmax,yzrmin,yzrmax],origin='upper', cmap=new_map) #
     
     #cb.set_label(title)
     plt.title(saison+'   '+annee+'   jour : '+str(j))
     print pathPNG+myfile
     
-#    plt.savefig(pathPNG+myfile[0:41]+'.png',dpi=200,bbox_inches='tight')
-    plt.show()
-    plt.cla()
-    
+    plt.savefig(pathPNG+myfile[0:41]+'.png',dpi=200,bbox_inches='tight')
+    plt.imshow(np.zeros(np.shape(l3d)), cmap=plt.get_cmap('Greys'))             ### --> Matrice vide pour reset image (sinon superposition)
+#    plt.show()
     sys.exit()
+plt.close()
 
 print 'fin'

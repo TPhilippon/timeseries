@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+##### ** Script non fonctionnel ** #####
+
 import sys
 import os
 import bz2

@@ -14,15 +14,15 @@ from matplotlib.patches import Polygon
 varnum = 3
 variable = ['nsst_8d', 'pic_8d', 'sst11mic_8d', 'chl_8d'][varnum]
 bzi=20  # marge autour des ZI pour la zoom
-xzrmin,xzrmax,yzrmin,yzrmax=1250,1750,750,1100     # Coordonnées SWF
-# 2500,3500,1500,2200 # Coordonnées MODIS
+xzrmin,xzrmax,yzrmin,yzrmax=1250,1750,750,1100      # Coordonnées SWF
+# 2500,3500,1500,2200                               # Coordonnées MODIS
 
 nzi=4   # nombre de zi
-ezi=np.zeros((nzi,),dtype=('i4,i4,i4,i4'))   #  Stockage des coordonnées des ZI
+ezi=np.zeros((nzi,),dtype=('i4,i4,i4,i4'))          # Stockage des coordonnées des ZI
 ezi[0:nzi]=([( 1429 ,  1432 ,   882 ,   888 ),
        ( 1435 ,  1438 ,   902 ,   907 ),
        ( 1408 ,  1410 ,   860,   863),
-       ( 1715 ,  1718 ,   900 ,   903)])    # Coordonnées des ZI SWF
+       ( 1715 ,  1718 ,   900 ,   903)])            # Coordonnées des ZI SWF
 #ezi[0:nzi]=([(2862,2868,1766,1774),(2870,2874,1810,1814),(2858,2862,1741,1745),(3430,3434,1800,1805)])  # Coordonnées des ZI MODIS
 
 pathZR ='/home/pressions/SATELITIME/data/ZR/swf/' 
